@@ -1,0 +1,551 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jarvis</title>
+<meta name="description" content="Live health of every Williams Digital production site, checked every fifteen minutes.">
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ground:#070710; --panel:#0E0E1C; --line:rgba(255,255,255,.08); --line-strong:rgba(255,255,255,.16);
+  --ink:#FFFFFF; --soft:#A1A1AA; --muted:#71717A;
+  --jarvis:#06B6D4; --jarvis-dim:rgba(6,182,212,.35);
+  --up:#10B981; --degraded:#F59E0B; --down:#EF4444; --unknown:#3F3F46;
+  --sans:Inter,system-ui,-apple-system,"Segoe UI",sans-serif; --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --gutter:16px;
+}
+*{box-sizing:border-box}
+html{background:var(--ground);color-scheme:dark}
+body{
+  margin:0;background:var(--ground);color:var(--ink);font-family:var(--sans);font-weight:400;font-size:15px;line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+  background-image:linear-gradient(rgba(99,102,241,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(99,102,241,.04) 1px,transparent 1px);
+  background-size:64px 64px;
+}
+a{color:inherit}
+button{font:inherit;color:inherit}
+.wrap{max-width:1080px;margin:0 auto;padding:28px var(--gutter) 80px}
+
+/* header */
+header{display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:36px}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.08em;color:var(--jarvis);margin:0 0 4px}
+h1{font-weight:300;font-size:40px;letter-spacing:-.025em;line-height:1.08;margin:0}
+.checked{color:var(--soft);font-size:14px}
+.checked time{font-family:var(--mono);color:var(--ink)}
+.checked .stale{color:var(--degraded)}
+
+/* hero: ring + facts */
+.hero{display:grid;grid-template-columns:260px 1fr;gap:40px;align-items:center;margin-bottom:44px}
+.ring{position:relative;width:240px;height:240px;margin:0 auto}
+.ring svg{display:block;width:100%;height:100%;overflow:visible}
+.ring .seg{fill:none;stroke-width:11;stroke-linecap:butt;transition:stroke .4s}
+.ring .seg.up{stroke:var(--up)} .ring .seg.degraded{stroke:var(--degraded)} .ring .seg.down{stroke:var(--down)} .ring .seg.unknown{stroke:var(--unknown)}
+.ring .seg:hover,.ring .seg:focus-visible{stroke-width:15;outline:none}
+.ring .track{fill:none;stroke:var(--line);stroke-width:11}
+.ring .inner{fill:none;stroke:var(--jarvis-dim);stroke-width:1}
+.ring .sweep{position:absolute;inset:14px;border-radius:50%;pointer-events:none;
+  background:conic-gradient(from 0deg,transparent 0 300deg,rgba(6,182,212,.0) 300deg,rgba(6,182,212,.45) 360deg);
+  -webkit-mask:radial-gradient(circle,transparent 58%,#000 60%,#000 100%);mask:radial-gradient(circle,transparent 58%,#000 60%,#000 100%);
+  opacity:0;animation:sweep 2.4s cubic-bezier(.3,.7,.3,1) .2s 1}
+@keyframes sweep{0%{opacity:0;transform:rotate(0)}15%{opacity:1}100%{opacity:0;transform:rotate(720deg)}}
+.ring.alert .glow{position:absolute;inset:0;border-radius:50%;box-shadow:0 0 48px 6px rgba(239,68,68,.25);animation:breathe 2.6s ease-in-out infinite;pointer-events:none}
+@keyframes breathe{50%{box-shadow:0 0 64px 12px rgba(239,68,68,.4)}}
+.center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px;pointer-events:none}
+.center .big{font-family:var(--mono);font-weight:500;font-size:44px;line-height:1;letter-spacing:-.03em}
+.center .big.down{color:var(--down)} .center .big.degraded{color:var(--degraded)}
+.center .sub{color:var(--soft);font-size:13px;margin-top:6px}
+.facts{display:grid;gap:18px}
+.facts p{margin:0}
+.facts .headline{font-size:22px;font-weight:300;letter-spacing:-.01em;line-height:1.3;max-width:34ch}
+.facts dl{display:grid;grid-template-columns:repeat(3,auto);gap:8px 28px;margin:0;justify-content:start}
+.facts dt{color:var(--muted);font-size:13px}
+.facts dd{margin:0;font-family:var(--mono);font-size:15px}
+.facts dd small{font-family:var(--sans);color:var(--soft);font-size:13px;display:block}
+
+/* controls */
+.controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+.seg-ctl{display:inline-flex;border:1px solid var(--line-strong);border-radius:8px;overflow:hidden}
+.seg-ctl button{background:transparent;border:0;padding:7px 13px;color:var(--soft);cursor:pointer;min-height:36px}
+.seg-ctl button[aria-pressed="true"]{background:rgba(255,255,255,.06);color:var(--ink)}
+.seg-ctl button:focus-visible{outline:2px solid var(--jarvis);outline-offset:-2px}
+.controls .spacer{flex:1}
+.controls .hint{color:var(--muted);font-size:13px}
+
+/* table */
+table{width:100%;border-collapse:collapse}
+.c-status{width:96px}.c-spark{width:160px}.c-ms{width:90px}.c-up{width:130px}.c-cert{width:100px}.c-since{width:120px}
+thead th{text-align:left;font-weight:500;color:var(--muted);font-size:13px;padding:8px 10px;border-bottom:1px solid var(--line-strong)}
+tbody tr.site td{padding:11px 10px;border-bottom:1px solid var(--line);vertical-align:middle}
+tbody tr.group td{padding:22px 10px 6px;color:var(--soft);font-size:13px;border:0}
+tbody tr.site:hover td{background:rgba(255,255,255,.025)}
+td.num,th.num{text-align:right;font-family:var(--mono);font-size:14px;white-space:nowrap;font-variant-numeric:tabular-nums}
+td.num .unit{color:var(--muted);font-size:12px;margin-left:2px}
+.status{display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--unknown);flex:none;box-shadow:0 0 0 2px var(--ground)}
+.dot.up{background:var(--up)} .dot.degraded{background:var(--degraded)} .dot.down{background:var(--down);box-shadow:0 0 0 2px var(--ground),0 0 10px rgba(239,68,68,.6)}
+.status .label{font-size:13px;color:var(--soft);min-width:4.5em}
+.name{background:none;border:0;padding:0;cursor:pointer;text-align:left;font-weight:500;display:inline-flex;align-items:center;gap:8px;min-height:32px}
+.name:focus-visible{outline:2px solid var(--jarvis);outline-offset:3px;border-radius:3px}
+.name .chev{width:10px;height:10px;color:var(--muted);transition:transform .2s}
+.name[aria-expanded="true"] .chev{transform:rotate(90deg)}
+.name:hover{color:var(--jarvis)}
+td.spark{width:150px;padding-top:6px;padding-bottom:6px}
+.spark svg{display:block;width:140px;height:30px;overflow:visible}
+.spark .line{fill:none;stroke:var(--jarvis);stroke-width:1.5;stroke-linejoin:round;stroke-linecap:round}
+.spark .fail{stroke:var(--down);stroke-width:2}
+.spark .slow{stroke:var(--degraded);stroke-width:2}
+.spark .hit{fill:transparent}
+.spark .cursor{stroke:var(--line-strong);stroke-width:1;display:none}
+.spark .pt{fill:var(--jarvis);stroke:var(--ground);stroke-width:2;display:none}
+.spark .dotm,.chart .dotm{fill:var(--jarvis)}
+.cert.soon{color:var(--degraded)}
+.cert.urgent{color:var(--down)}
+.since{color:var(--soft);font-size:13px;white-space:nowrap}
+tr.site.open td{border-bottom:0}
+
+/* detail */
+tr.detail td{padding:6px 10px 22px;border-bottom:1px solid var(--line)}
+.detail-wrap{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:18px 18px 14px;display:grid;gap:18px}
+.detail-head{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:baseline}
+.detail-head h3{margin:0;font-weight:500;font-size:16px}
+.detail-head .meta{color:var(--soft);font-size:13px}
+.detail-head .meta a{color:var(--soft)}
+.detail-head .meta a:hover{color:var(--jarvis)}
+.daily{display:grid;gap:8px}
+.daily .cells{display:grid;grid-template-columns:repeat(30,minmax(0,1fr));gap:2px}
+.daily .cell{height:22px;border-radius:3px;background:var(--unknown);opacity:.45;cursor:default}
+.daily .cell.up{background:var(--up);opacity:1} .daily .cell.degraded{background:var(--degraded);opacity:1} .daily .cell.down{background:var(--down);opacity:1}
+.daily .cell:hover{outline:2px solid var(--ground);outline-offset:-2px;filter:brightness(1.2)}
+.daily .axis{display:flex;justify-content:space-between;color:var(--muted);font-size:12px;font-family:var(--mono)}
+.chart{position:relative}
+.chart svg{display:block;width:100%;height:170px;overflow:visible}
+.chart .grid{stroke:var(--line);stroke-width:1}
+.chart .ylab{fill:var(--muted);font-size:11px;font-family:var(--mono)}
+.chart .xlab{fill:var(--muted);font-size:11px;font-family:var(--mono)}
+.chart .line{fill:none;stroke:var(--jarvis);stroke-width:2;stroke-linejoin:round}
+.chart .fail{stroke:var(--down);stroke-width:2}
+.chart .slow{stroke:var(--degraded);stroke-width:2}
+.chart .cursor{stroke:var(--line-strong);stroke-width:1;display:none}
+.chart .pt{fill:var(--jarvis);stroke:var(--ground);stroke-width:2;display:none}
+.chart .hit{fill:transparent}
+.chart .empty{fill:var(--muted);font-size:13px}
+.facts-row{display:flex;gap:22px;flex-wrap:wrap;color:var(--soft);font-size:13px}
+.facts-row b{font-family:var(--mono);font-weight:500;color:var(--ink)}
+
+/* tooltip */
+.tip{position:fixed;z-index:10;pointer-events:none;background:#17172A;border:1px solid var(--line-strong);border-radius:6px;padding:6px 9px;font-size:12px;color:var(--soft);white-space:nowrap;display:none;box-shadow:0 8px 24px rgba(0,0,0,.4)}
+.tip b{font-family:var(--mono);color:var(--ink);font-weight:500}
+
+/* states */
+.notice{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px 18px;color:var(--soft);margin-bottom:20px}
+.notice.err{border-color:rgba(239,68,68,.4)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+footer{margin-top:40px;color:var(--muted);font-size:13px;display:flex;gap:16px;flex-wrap:wrap}
+footer a{color:var(--muted)} footer a:hover{color:var(--jarvis)}
+
+@media (max-width:360px){
+  td.spark{width:78px}
+  .spark svg{width:72px}
+  .wrap{padding-left:12px;padding-right:12px}
+}
+@media (prefers-reduced-motion:reduce){.ring .sweep,.ring.alert .glow{animation:none}.ring .sweep{display:none}}
+@media (max-width:860px){
+  .hero{grid-template-columns:1fr;gap:24px;text-align:center}
+  .facts .headline{max-width:none;margin:0 auto}
+  .facts dl{justify-content:center}
+  th.hide-m,td.hide-m{display:none}
+}
+@media (max-width:560px){
+  h1{font-size:32px}
+  .ring{width:200px;height:200px}
+  .center .big{font-size:36px}
+  .facts dl{grid-template-columns:repeat(3,1fr);gap:10px 8px;text-align:center}
+  .facts dt{font-size:12px}
+  .facts dd{font-size:14px}
+  .facts dd small{font-size:12px}
+  thead{display:none}
+  tbody tr.site td{padding:10px 4px}
+  .status .label{display:none}
+  td.spark{width:96px;padding-left:2px;padding-right:2px}
+  .spark svg{width:90px}
+  td.num{font-size:13px}
+  .daily .cell{height:18px;border-radius:2px}
+  .detail-wrap{padding:14px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <p class="eyebrow">// Williams Digital operations</p>
+      <h1>Jarvis</h1>
+    </div>
+    <p class="checked" id="checked">Loading the latest check…</p>
+  </header>
+
+  <div id="notice" class="notice" hidden></div>
+
+  <section class="hero" aria-label="Fleet status">
+    <div class="ring" id="ring">
+      <div class="sweep"></div>
+      <svg viewBox="0 0 240 240" id="ringSvg" aria-hidden="true"></svg>
+      <div class="center">
+        <div class="big" id="bigNum">—</div>
+        <div class="sub" id="bigSub">checking</div>
+      </div>
+    </div>
+    <div class="facts">
+      <p class="headline" id="headline">Reaching the monitor…</p>
+      <dl>
+        <div><dt>Slowest right now</dt><dd id="fSlow">—</dd></div>
+        <div><dt>Next certificate to renew</dt><dd id="fCert">—</dd></div>
+        <div><dt>Fleet uptime, 30 days</dt><dd id="fUp">—</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <div class="controls">
+    <div class="seg-ctl" role="group" aria-label="Show">
+      <button type="button" data-filter="all" aria-pressed="true">All sites</button>
+      <button type="button" data-filter="own" aria-pressed="false">Our products</button>
+      <button type="button" data-filter="client" aria-pressed="false">Client sites</button>
+    </div>
+    <div class="seg-ctl" role="group" aria-label="History range for an opened site">
+      <button type="button" data-range="24h" aria-pressed="true">24 hours</button>
+      <button type="button" data-range="7d" aria-pressed="false">7 days</button>
+      <button type="button" data-range="30d" aria-pressed="false">30 days</button>
+    </div>
+    <span class="spacer"></span>
+    <span class="hint">Select a site to see its history</span>
+  </div>
+
+  <table id="table">
+    <thead>
+      <tr>
+        <th class="c-status">Status</th>
+        <th>Site</th>
+        <th class="c-spark">Last 24 hours</th>
+        <th class="num c-ms">Response</th>
+        <th class="num hide-m c-up">Uptime, 30 days</th>
+        <th class="num hide-m c-cert">Certificate</th>
+        <th class="hide-m c-since">Since</th>
+      </tr>
+    </thead>
+    <tbody id="rows"></tbody>
+  </table>
+
+  <footer>
+    <span>Checked every 15 minutes from GitHub Actions.</span>
+    <a href="data/latest.json">latest.json</a>
+    <a href="https://github.com/Williamsdg/wd-monitor">Source</a>
+  </footer>
+</div>
+<div class="tip" id="tip" role="status" aria-live="polite"></div>
+
+<script>
+// Set this once the ElevenLabs agent exists to put Jarvis's voice widget on the page.
+const JARVIS_AGENT_ID = '';
+
+const S = { latest: null, spark: null, daily: null, filter: 'all', range: '24h', open: null, histories: {}, lastFetch: 0 };
+const $ = (id) => document.getElementById(id);
+const tip = $('tip');
+const bust = (p) => `${p}?t=${Math.floor(Date.now() / 60000)}`;
+const fmtMs = (ms) => ms == null ? '—' : ms >= 1000 ? `${(ms / 1000).toFixed(2)}<span class="unit">s</span>` : `${ms}<span class="unit">ms</span>`;
+const plainMs = (ms) => ms == null ? '—' : ms >= 1000 ? `${(ms / 1000).toFixed(2)} s` : `${ms} ms`;
+const timeFmt = new Intl.DateTimeFormat('en-US', { timeZone: 'America/Chicago', hour: 'numeric', minute: '2-digit' });
+const dayFmt = new Intl.DateTimeFormat('en-US', { timeZone: 'America/Chicago', month: 'short', day: 'numeric' });
+const dayTimeFmt = new Intl.DateTimeFormat('en-US', { timeZone: 'America/Chicago', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+const esc = (s) => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+function ago(sec, { short = false } = {}) {
+  const d = Math.max(0, Math.floor(Date.now() / 1000) - sec);
+  if (d < 60) return short ? 'now' : 'just now';
+  const m = Math.floor(d / 60), h = Math.floor(m / 60), days = Math.floor(h / 24);
+  if (m < 60) return `${m} min${short ? '' : ' ago'}`;
+  if (h < 48) return `${h} hr${h === 1 ? '' : 's'}${short ? '' : ' ago'}`;
+  return `${days} day${days === 1 ? '' : 's'}${short ? '' : ' ago'}`;
+}
+function statusWord(s) { return s === 'up' ? 'Up' : s === 'degraded' ? 'Degraded' : s === 'down' ? 'Down' : 'Unknown'; }
+
+async function getJson(path) {
+  const r = await fetch(bust(path), { cache: 'no-store' });
+  if (!r.ok) throw new Error(`${path} ${r.status}`);
+  return r.json();
+}
+
+async function load() {
+  try {
+    const [latest, spark] = await Promise.all([getJson('data/latest.json'), getJson('data/spark.json')]);
+    S.latest = latest; S.spark = spark; S.lastFetch = Date.now();
+    $('notice').hidden = true;
+    render();
+  } catch (e) {
+    const n = $('notice');
+    n.hidden = false; n.className = 'notice err';
+    n.textContent = S.latest ? `Couldn't refresh (${e.message}). Showing the last data that loaded.` : `The monitor data isn't reachable yet (${e.message}). The first GitHub Actions run writes it.`;
+  }
+}
+
+function render() {
+  const L = S.latest;
+  renderClock();
+  renderRing(L);
+  renderFacts(L);
+  renderRows(L);
+}
+
+function renderClock() {
+  if (!S.latest) return;
+  const t = Math.floor(Date.parse(S.latest.generatedAt) / 1000);
+  const staleSec = Math.floor(Date.now() / 1000) - t;
+  const stale = staleSec > 45 * 60;
+  $('checked').innerHTML = `Checked <time datetime="${esc(S.latest.generatedAt)}" class="${stale ? 'stale' : ''}">${esc(ago(t))}</time>${stale ? ' — the cron may be behind' : ''}`;
+}
+
+function renderRing(L) {
+  const svg = $('ringSvg');
+  const sites = L.sites, n = sites.length;
+  const r = 104, c = 2 * Math.PI * r, gap = 3;
+  const seg = c / n - gap;
+  let out = `<circle class="track" cx="120" cy="120" r="${r}"/><circle class="inner" cx="120" cy="120" r="86"/>`;
+  sites.forEach((s, i) => {
+    const rot = (360 / n) * i - 90;
+    out += `<circle class="seg ${s.status}" cx="120" cy="120" r="${r}" stroke-dasharray="${seg} ${c - seg}" transform="rotate(${rot} 120 120)" data-slug="${esc(s.slug)}" tabindex="-1"><title>${esc(s.name)}: ${statusWord(s.status)}, ${plainMs(s.ms)}</title></circle>`;
+  });
+  svg.innerHTML = out;
+  const { up, degraded, down, total } = L.summary;
+  const big = $('bigNum'), sub = $('bigSub');
+  big.className = 'big ' + (down ? 'down' : degraded ? 'degraded' : '');
+  if (down) { big.textContent = down; sub.textContent = `of ${total} down`; }
+  else if (degraded) { big.textContent = degraded; sub.textContent = `of ${total} degraded`; }
+  else { big.textContent = up; sub.textContent = `of ${total} sites up`; }
+  $('ring').classList.toggle('alert', down > 0);
+  svg.querySelectorAll('.seg').forEach(el => {
+    el.addEventListener('mouseenter', (e) => showTip(e, el.querySelector('title').textContent));
+    el.addEventListener('mousemove', moveTip);
+    el.addEventListener('mouseleave', hideTip);
+    el.addEventListener('click', () => { openDetail(el.dataset.slug, { scroll: true }); });
+  });
+}
+
+function renderFacts(L) {
+  $('headline').textContent = L.headline;
+  const live = L.sites.filter(s => s.ms != null && s.status !== 'down');
+  const slow = live.slice().sort((a, b) => b.ms - a.ms)[0];
+  $('fSlow').innerHTML = slow ? `${fmtMs(slow.ms)}<small>${esc(slow.name)}</small>` : '—';
+  const cert = L.sites.filter(s => typeof s.sslDays === 'number').sort((a, b) => a.sslDays - b.sslDays)[0];
+  $('fCert').innerHTML = cert ? `${cert.sslDays}<span class="unit"> days</span><small>${esc(cert.name)}</small>` : '—';
+  const ups = L.sites.map(s => s.uptime30d).filter(v => typeof v === 'number');
+  const fleet = ups.length ? (ups.reduce((a, b) => a + b, 0) / ups.length) : null;
+  $('fUp').innerHTML = fleet == null ? '—' : `${fleet.toFixed(fleet === 100 ? 0 : 2)}<span class="unit">%</span><small>${L.sites.length} sites</small>`;
+}
+
+function certClass(d) { return d == null ? '' : d < 14 ? 'cert urgent' : d < 30 ? 'cert soon' : 'cert'; }
+
+function renderRows(L) {
+  const tbody = $('rows');
+  const groups = [['own', 'Our products'], ['client', 'Client sites']];
+  let html = '';
+  for (const [owner, label] of groups) {
+    const rows = L.sites.filter(s => s.owner === owner && (S.filter === 'all' || S.filter === owner));
+    if (!rows.length) continue;
+    html += `<tr class="group"><td colspan="7">${label} (${rows.length})</td></tr>`;
+    for (const s of rows) {
+      const open = S.open === s.slug;
+      html += `<tr class="site ${open ? 'open' : ''}" data-slug="${esc(s.slug)}">
+        <td><span class="status"><span class="dot ${s.status}"></span><span class="label">${statusWord(s.status)}</span></span></td>
+        <td><button type="button" class="name" aria-expanded="${open}" aria-controls="d-${esc(s.slug)}" data-open="${esc(s.slug)}">
+          <svg class="chev" viewBox="0 0 10 10" aria-hidden="true"><path d="M3 1l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>${esc(s.name)}</button></td>
+        <td class="spark" data-spark="${esc(s.slug)}"></td>
+        <td class="num">${fmtMs(s.ms)}</td>
+        <td class="num hide-m">${s.uptime30d == null ? '—' : s.uptime30d + '<span class="unit">%</span>'}</td>
+        <td class="num hide-m ${certClass(s.sslDays)}">${s.sslDays == null ? '—' : s.sslDays + '<span class="unit">d</span>'}</td>
+        <td class="hide-m"><span class="since">${s.since ? esc(statusWord(s.status).toLowerCase() + ' for ' + ago(s.since, { short: true })) : '—'}</span></td>
+      </tr>`;
+      if (open) html += `<tr class="detail" id="d-${esc(s.slug)}"><td colspan="7"><div class="detail-wrap" data-detail="${esc(s.slug)}"></div></td></tr>`;
+    }
+  }
+  tbody.innerHTML = html;
+  tbody.querySelectorAll('[data-spark]').forEach(td => drawSpark(td, S.spark[td.dataset.spark] || []));
+  tbody.querySelectorAll('[data-open]').forEach(b => b.addEventListener('click', () => openDetail(b.dataset.open)));
+  if (S.open) fillDetail(S.open);
+}
+
+// --- sparkline (single series, no legend; failures and slow samples marked) ---
+function drawSpark(td, series) {
+  const W = 140, H = 30;
+  if (!series.length) { td.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="No samples yet"><line x1="0" y1="${H / 2}" x2="${W}" y2="${H / 2}" stroke="rgba(255,255,255,.1)" stroke-dasharray="2 3"/></svg>`; return; }
+  const now = Math.floor(Date.now() / 1000), t0 = now - 24 * 3600;
+  const x = (t) => Math.max(0, Math.min(W, ((t - t0) / (24 * 3600)) * W));
+  const ok = series.filter(p => p[2] !== 'down');
+  const max = Math.max(500, ...ok.map(p => p[1]));
+  const y = (ms) => H - 2 - (Math.min(ms, max) / max) * (H - 4);
+  let d = '', prev = null;
+  for (const p of series) {
+    if (p[2] === 'down') { prev = null; continue; }
+    d += (prev ? ' L' : 'M') + `${x(p[0]).toFixed(1)} ${y(p[1]).toFixed(1)}`;
+    prev = p;
+  }
+  const marks = series.filter(p => p[2] !== 'up').map(p => `<line class="${p[2] === 'down' ? 'fail' : 'slow'}" x1="${x(p[0]).toFixed(1)}" y1="${H - 4}" x2="${x(p[0]).toFixed(1)}" y2="${H}"/>`).join('');
+  const last = series[series.length - 1];
+  const dots = series.length < 12 ? ok.map(p => `<circle class="dotm" cx="${x(p[0]).toFixed(1)}" cy="${y(p[1]).toFixed(1)}" r="2.5"/>`).join('') : '';
+  td.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="24-hour response time, latest ${plainMs(last[1])}">
+    <path class="line" d="${d}"/>${dots}${marks}
+    <line class="cursor" y1="0" y2="${H}"/><circle class="pt" r="3"/>
+    <rect class="hit" x="0" y="0" width="${W}" height="${H}"/></svg>`;
+  attachHover(td.querySelector('svg'), series, { x, y, W });
+}
+
+function attachHover(svg, series, { x, y, W }) {
+  const cursor = svg.querySelector('.cursor'), pt = svg.querySelector('.pt');
+  const rect = svg.querySelector('.hit');
+  rect.addEventListener('mousemove', (e) => {
+    const b = svg.getBoundingClientRect();
+    const px = ((e.clientX - b.left) / b.width) * W;
+    let best = series[0], bd = Infinity;
+    for (const p of series) { const d = Math.abs(x(p[0]) - px); if (d < bd) { bd = d; best = p; } }
+    const cx = x(best[0]);
+    cursor.setAttribute('x1', cx); cursor.setAttribute('x2', cx); cursor.style.display = 'block';
+    if (best[2] === 'down') { pt.style.display = 'none'; } else { pt.setAttribute('cx', cx); pt.setAttribute('cy', y(best[1])); pt.style.display = 'block'; }
+    showTip(e, `${dayTimeFmt.format(new Date(best[0] * 1000))} <b>${best[2] === 'down' ? 'down' : plainMs(best[1])}</b>${best[2] === 'degraded' ? ' degraded' : ''}`, true);
+  });
+  rect.addEventListener('mouseleave', () => { cursor.style.display = 'none'; pt.style.display = 'none'; hideTip(); });
+}
+
+// --- detail panel: 30-day daily strip + response line for the chosen range ---
+async function openDetail(slug, { scroll = false } = {}) {
+  S.open = S.open === slug && !scroll ? null : slug;
+  renderRows(S.latest);
+  if (S.open && scroll) document.querySelector(`tr[data-slug="${slug}"]`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+async function fillDetail(slug) {
+  const box = document.querySelector(`[data-detail="${slug}"]`);
+  if (!box) return;
+  const s = S.latest.sites.find(x => x.slug === slug);
+  box.innerHTML = `<div class="detail-head"><h3>${esc(s.name)}</h3><span class="meta"><a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.url.replace(/^https?:\/\//, '').replace(/\/$/, ''))}</a>${s.note ? ' — ' + esc(s.note) : ''}</span></div>
+    <div class="facts-row"><span>Uptime 24h <b>${s.uptime24h ?? '—'}%</b></span><span>Uptime 30d <b>${s.uptime30d ?? '—'}%</b></span><span>Certificate <b>${s.sslDays ?? '—'} days</b></span><span>HTTP <b>${s.httpStatus ?? '—'}</b></span><span>${statusWord(s.status)} for <b>${s.since ? ago(s.since, { short: true }) : '—'}</b></span></div>
+    <div class="daily" data-daily></div>
+    <div class="chart" data-chart><svg viewBox="0 0 800 170"><text class="empty" x="0" y="90">Loading history…</text></svg></div>`;
+  try {
+    if (!S.daily || Date.now() - S.lastFetch > 60000) S.daily = await getJson('data/daily.json');
+  } catch { S.daily = S.daily || {}; }
+  drawDaily(box.querySelector('[data-daily]'), S.daily[slug] || {});
+  let series;
+  if (S.range === '24h') series = S.spark[slug] || [];
+  else {
+    try {
+      if (!S.histories[slug] || Date.now() - S.histories[slug].at > 60000) S.histories[slug] = { at: Date.now(), data: await getJson(`data/history/${slug}.json`) };
+      const win = S.range === '7d' ? 7 * 86400 : 30 * 86400, now = Math.floor(Date.now() / 1000);
+      series = S.histories[slug].data.filter(h => h.t >= now - win).map(h => [h.t, h.ms, h.s]);
+    } catch { series = []; }
+  }
+  if (S.open === slug) drawChart(box.querySelector('[data-chart]'), series);
+}
+
+function drawDaily(el, days) {
+  const keys = [];
+  const d = new Date();
+  for (let i = 29; i >= 0; i--) {
+    const t = new Date(d.getTime() - i * 86400000);
+    keys.push(new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Chicago', year: 'numeric', month: '2-digit', day: '2-digit' }).format(t));
+  }
+  const cells = keys.map(k => {
+    const v = days[k];
+    if (!v || !v.n) return `<div class="cell" data-k="${k}" data-t="${k}: no checks"></div>`;
+    const pct = (v.up / v.n) * 100;
+    const cls = pct === 100 ? 'up' : pct >= 99 ? 'degraded' : 'down';
+    const avg = Math.round(v.msSum / v.n);
+    return `<div class="cell ${cls}" data-t="${k}: ${pct.toFixed(pct === 100 ? 0 : 1)}% up, avg ${plainMs(avg)}, ${v.n} checks"></div>`;
+  }).join('');
+  el.innerHTML = `<div class="cells">${cells}</div><div class="axis"><span>${keys[0].slice(5)}</span><span>30 days, one cell per day</span><span>${keys[29].slice(5)}</span></div>`;
+  el.querySelectorAll('.cell').forEach(c => {
+    c.addEventListener('mouseenter', (e) => showTip(e, esc(c.dataset.t)));
+    c.addEventListener('mousemove', moveTip);
+    c.addEventListener('mouseleave', hideTip);
+  });
+}
+
+function drawChart(el, series) {
+  const narrow = el.clientWidth < 560;
+  const W = narrow ? 380 : 800, H = 170, padL = 40, padB = 22, padT = 8;
+  if (!series.length) { el.innerHTML = `<svg viewBox="0 0 ${W} ${H}"><text class="empty" x="0" y="90">No samples in this range yet.</text></svg>`; return; }
+  const now = Math.floor(Date.now() / 1000);
+  const win = S.range === '24h' ? 24 * 3600 : S.range === '7d' ? 7 * 86400 : 30 * 86400;
+  const t0 = now - win;
+  const x = (t) => padL + Math.max(0, Math.min(1, (t - t0) / win)) * (W - padL);
+  const ok = series.filter(p => p[2] !== 'down');
+  const rawMax = Math.max(500, ...ok.map(p => p[1]));
+  const step = rawMax <= 1000 ? 250 : rawMax <= 3000 ? 500 : rawMax <= 6000 ? 1000 : 2500;
+  const max = Math.ceil(rawMax / step) * step;
+  const y = (ms) => padT + (1 - Math.min(ms, max) / max) * (H - padT - padB);
+  let grid = '', labels = '';
+  for (let v = 0; v <= max; v += step) {
+    grid += `<line class="grid" x1="${padL}" x2="${W}" y1="${y(v).toFixed(1)}" y2="${y(v).toFixed(1)}"/>`;
+    labels += `<text class="ylab" x="${padL - 8}" y="${(y(v) + 4).toFixed(1)}" text-anchor="end">${v >= 1000 ? (v / 1000) + 's' : v}</text>`;
+  }
+  const ticks = narrow ? 3 : S.range === '24h' ? 6 : S.range === '7d' ? 7 : 6;
+  let xl = '';
+  for (let i = 0; i <= ticks; i++) {
+    const t = t0 + (win / ticks) * i;
+    const lab = S.range === '24h' ? timeFmt.format(new Date(t * 1000)) : dayFmt.format(new Date(t * 1000));
+    xl += `<text class="xlab" x="${x(t).toFixed(1)}" y="${H - 4}" text-anchor="${i === 0 ? 'start' : i === ticks ? 'end' : 'middle'}">${lab}</text>`;
+  }
+  let d = '', prev = null;
+  for (const p of series) {
+    if (p[2] === 'down') { prev = null; continue; }
+    d += (prev ? ' L' : 'M') + `${x(p[0]).toFixed(1)} ${y(p[1]).toFixed(1)}`;
+    prev = p;
+  }
+  const marks = series.filter(p => p[2] !== 'up').map(p => `<line class="${p[2] === 'down' ? 'fail' : 'slow'}" x1="${x(p[0]).toFixed(1)}" x2="${x(p[0]).toFixed(1)}" y1="${(H - padB - 6)}" y2="${H - padB}"/>`).join('');
+  const dots = series.length < 48 ? ok.map(p => `<circle class="dotm" cx="${x(p[0]).toFixed(1)}" cy="${y(p[1]).toFixed(1)}" r="4"/>`).join('') : '';
+  el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Response time over the selected range">${grid}${labels}${xl}
+    <path class="line" d="${d}"/>${dots}${marks}
+    <line class="cursor" y1="${padT}" y2="${H - padB}"/><circle class="pt" r="4"/>
+    <rect class="hit" x="${padL}" y="0" width="${W - padL}" height="${H}"/></svg>`;
+  attachHover(el.querySelector('svg'), series, { x, y, W });
+}
+
+// --- tooltip ---
+function showTip(e, html, isHtml = false) { tip.innerHTML = isHtml ? html : html.replace(/</g, '&lt;'); tip.style.display = 'block'; moveTip(e); }
+function moveTip(e) {
+  const pad = 14, w = tip.offsetWidth, h = tip.offsetHeight;
+  let left = e.clientX + pad, top = e.clientY - h - pad;
+  if (left + w > window.innerWidth - 8) left = e.clientX - w - pad;
+  if (top < 8) top = e.clientY + pad;
+  tip.style.left = left + 'px'; tip.style.top = top + 'px';
+}
+function hideTip() { tip.style.display = 'none'; }
+
+// --- controls ---
+document.querySelectorAll('[data-filter]').forEach(b => b.addEventListener('click', () => {
+  S.filter = b.dataset.filter;
+  document.querySelectorAll('[data-filter]').forEach(x => x.setAttribute('aria-pressed', x === b));
+  if (S.latest) renderRows(S.latest);
+}));
+document.querySelectorAll('[data-range]').forEach(b => b.addEventListener('click', () => {
+  S.range = b.dataset.range;
+  document.querySelectorAll('[data-range]').forEach(x => x.setAttribute('aria-pressed', x === b));
+  if (S.open) fillDetail(S.open);
+}));
+
+if (JARVIS_AGENT_ID) {
+  const w = document.createElement('elevenlabs-convai');
+  w.setAttribute('agent-id', JARVIS_AGENT_ID);
+  document.body.appendChild(w);
+  const sc = document.createElement('script');
+  sc.src = 'https://unpkg.com/@elevenlabs/convai-widget-embed'; sc.async = true;
+  document.body.appendChild(sc);
+}
+
+load();
+setInterval(load, 60000);
+setInterval(renderClock, 15000);
+</script>
+</body>
+</html>

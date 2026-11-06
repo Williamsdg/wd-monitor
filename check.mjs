@@ -4,11 +4,11 @@ import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { lookup } from 'node:dns/promises';
 import tls from 'node:tls';
 import { classify, daysUntil } from './lib/status.mjs';
-import { appendSample, rollDaily, buildLatest } from './lib/aggregate.mjs';
+import { appendSample, rollDaily, buildLatest, recent } from './lib/aggregate.mjs';
 
 const ROOT = new URL('.', import.meta.url);
 const DATA = new URL('data/', ROOT);
-const HISTORY = new URL('data/history/', DATA);
+const HISTORY = new URL('history/', DATA);
 const UA = 'WD-Monitor/1.0 (+https://williamsdigital.io)';
 const TIMEOUT_MS = 15_000;
 const CONCURRENCY = 6;
@@ -81,15 +81,18 @@ const samples = await mapLimit(sites, CONCURRENCY, probe);
 
 let daily = await readJson(new URL('daily.json', DATA), {});
 const histories = {};
+const spark = {};
 for (const [i, site] of sites.entries()) {
   const file = new URL(`${site.slug}.json`, HISTORY);
   const history = appendSample(await readJson(file, []), samples[i], { now });
   histories[site.slug] = history;
+  spark[site.slug] = recent(history, { now, windowSec: 24 * 3600 });
   daily = rollDaily(daily, site.slug, samples[i]);
   await writeFile(file, JSON.stringify(history));
 }
 const latest = buildLatest(sites, histories, { now });
 await writeFile(new URL('daily.json', DATA), JSON.stringify(daily));
+await writeFile(new URL('spark.json', DATA), JSON.stringify(spark));
 await writeFile(new URL('latest.json', DATA), JSON.stringify(latest, null, 1));
 
 for (const r of latest.sites) {

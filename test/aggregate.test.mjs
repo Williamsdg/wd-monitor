@@ -70,3 +70,10 @@ test('buildLatest: per-site rows plus summary and headline', () => {
   assert.equal(row.uptime24h, 100);
   assert.equal(row.since, now - 900);
 });
+
+test('recent: compact [t, ms, status] tuples inside the window, oldest first', async () => {
+  const { recent } = await import('../lib/aggregate.mjs');
+  const now = 100_000;
+  const history = [s(now - 30 * H, 'up', 100), s(now - 2 * H, 'degraded', 3200), s(now, 'up', 250)];
+  assert.deepEqual(recent(history, { now, windowSec: 24 * H }), [[now - 2 * H, 3200, 'degraded'], [now, 250, 'up']]);
+});
