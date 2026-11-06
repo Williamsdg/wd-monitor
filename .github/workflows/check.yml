@@ -19,13 +19,19 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - run: node check.mjs
-      - name: Commit results
+      - name: Check sites and commit results
         run: |
           git config user.name "wd-monitor"
           git config user.email "monitor@williamsdigital.io"
-          git add data
-          if git diff --cached --quiet; then echo "no change"; exit 0; fi
-          git commit -m "check: $(date -u +%Y-%m-%dT%H:%MZ) [skip ci]"
-          git pull --rebase --autostash
-          git push
+          for attempt in 1 2 3; do
+            git fetch origin main
+            git reset -q --hard origin/main
+            node check.mjs
+            git add data
+            if git diff --cached --quiet; then echo "no change"; exit 0; fi
+            git commit -q -m "check: $(date -u +%Y-%m-%dT%H:%MZ) [skip ci]"
+            if git push origin HEAD:main; then exit 0; fi
+            echo "push rejected (attempt $attempt), another run landed first; re-checking"
+            sleep 5
+          done
+          echo "gave up after 3 attempts"; exit 1
