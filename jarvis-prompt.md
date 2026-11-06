@@ -36,13 +36,13 @@ You cannot fix sites, deploy, or send email. If Dylan asks you to do something y
 
 ### get_site_health
 - Method: GET
-- URL: https://williamsdg.github.io/wd-monitor/data/latest.json
+- URL: https://williamsdigital.io/wd-monitor/data/latest.json
 - Description: Current status of every Williams Digital production site. Call this before answering any question about whether sites are up, slow, or have SSL problems.
 - No parameters.
 
 ### get_site_history
 - Method: GET
-- URL: https://williamsdg.github.io/wd-monitor/data/history/{slug}.json
+- URL: https://williamsdigital.io/wd-monitor/data/history/{slug}.json
 - Description: Last 30 days of 15-minute samples for one site. Use when asked how a site has been doing over time.
 - Path parameter `slug` (string, required): one of williamsdigital, auburn-network, canvas-sports, film-room, legacy-sports, welcomehoa, ridgepole, buy-auburn, simpatico, sword-and-crown, cornerstone, atn-missions, senn-medicine, weaddalogo, vardar, cartpath.
 
