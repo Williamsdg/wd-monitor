@@ -1,0 +1,38 @@
+name: vitals
+on:
+  schedule:
+    - cron: '41 9 * * *'   # once a day, early morning Central
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: check
+  cancel-in-progress: false
+jobs:
+  lighthouse:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --omit=dev && npm i --no-save lighthouse@12
+      - name: Run Lighthouse on every site and commit data/vitals.json
+        run: |
+          git config user.name "wd-monitor"
+          git config user.email "monitor@williamsdigital.io"
+          node vitals.mjs
+          cp data/vitals.json /tmp/vitals.json
+          for attempt in 1 2 3; do
+            git fetch origin main
+            git reset -q --hard origin/main
+            cp /tmp/vitals.json data/vitals.json
+            git add data/vitals.json
+            if git diff --cached --quiet; then echo "no change"; exit 0; fi
+            git commit -q -m "vitals: $(date -u +%Y-%m-%d) [skip ci]"
+            if git push origin HEAD:main; then exit 0; fi
+            sleep 5
+          done
+          exit 1

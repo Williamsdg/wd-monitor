@@ -1,11 +1,12 @@
 name: check
 on:
   schedule:
-    - cron: '*/15 * * * *'
+    # Off the quarter-hour marks: GitHub drops a lot of :00/:15/:30/:45 cron firings under load.
+    - cron: '7,22,37,52 * * * *'
   workflow_dispatch:
   push:
     branches: [main]
-    paths: ['check.mjs', 'lib/**', 'sites.json']
+    paths: ['check.mjs', 'lib/**', 'sites.json', 'package.json', 'package-lock.json']
 permissions:
   contents: write
 concurrency:
@@ -14,11 +15,19 @@ concurrency:
 jobs:
   check:
     runs-on: ubuntu-latest
+    timeout-minutes: 14
+    env:
+      NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+      RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+      ALERT_TO: ${{ secrets.ALERT_TO }}
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: npm
+      - run: npm ci --omit=dev
       - name: Check sites and commit results
         run: |
           git config user.name "wd-monitor"

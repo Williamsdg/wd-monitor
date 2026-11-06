@@ -1,0 +1,52 @@
+# Jarvis's hands. ElevenLabs calls POST /repos/Williamsdg/wd-monitor/actions/workflows/actions.yml/dispatches
+# (with a fine-grained PAT) and this workflow does the work with repo secrets, so no token ever leaves GitHub.
+name: actions
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'What to do'
+        required: true
+        type: choice
+        options: [recheck, redeploy, issue]
+      target:
+        description: 'Site slug (for redeploy) or a short title (for issue)'
+        required: false
+        default: ''
+      note:
+        description: 'Free text: why, or what Jarvis was asked'
+        required: false
+        default: ''
+permissions:
+  contents: read
+  actions: write
+  issues: write
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      GH_TOKEN: ${{ github.token }}
+      DEPLOY_HOOKS: ${{ secrets.DEPLOY_HOOKS }}
+    steps:
+      - name: recheck
+        if: inputs.action == 'recheck'
+        run: gh workflow run check.yml -R "$GITHUB_REPOSITORY" && echo "queued a fresh check"
+      - name: redeploy
+        if: inputs.action == 'redeploy'
+        run: |
+          if [ -z "$DEPLOY_HOOKS" ]; then echo "DEPLOY_HOOKS secret is not set (JSON of slug -> deploy hook URL)"; exit 1; fi
+          hook=$(echo "$DEPLOY_HOOKS" | jq -r --arg s "${{ inputs.target }}" '.[$s] // empty')
+          if [ -z "$hook" ]; then echo "no deploy hook for '${{ inputs.target }}'"; exit 1; fi
+          code=$(curl -s -o /tmp/hook.out -w '%{http_code}' -X POST "$hook")
+          echo "deploy hook for ${{ inputs.target }} returned HTTP $code"; cat /tmp/hook.out; echo
+          [ "$code" -lt 400 ]
+      - name: issue
+        if: inputs.action == 'issue'
+        run: |
+          title="${{ inputs.target }}"; [ -z "$title" ] && title="Jarvis: ${{ inputs.note }}"
+          gh issue create -R "$GITHUB_REPOSITORY" --title "$title" --body "Opened by Jarvis.
+
+${{ inputs.note }}
+
+Dashboard: https://williamsdigital.io/wd-monitor/"

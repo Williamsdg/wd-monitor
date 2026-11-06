@@ -61,7 +61,7 @@ h1{font-weight:300;font-size:40px;letter-spacing:-.025em;line-height:1.08;margin
 .facts{display:grid;gap:18px}
 .facts p{margin:0}
 .facts .headline{font-size:22px;font-weight:300;letter-spacing:-.01em;line-height:1.3;max-width:34ch}
-.facts dl{display:grid;grid-template-columns:repeat(3,auto);gap:8px 28px;margin:0;justify-content:start}
+.facts dl{display:grid;grid-template-columns:repeat(4,auto);gap:8px 26px;margin:0;justify-content:start}
 .facts dt{color:var(--muted);font-size:13px}
 .facts dd{margin:0;font-family:var(--mono);font-size:15px}
 .facts dd small{font-family:var(--sans);color:var(--soft);font-size:13px;display:block}
@@ -147,6 +147,56 @@ tr.detail td{padding:6px 10px 22px;border-bottom:1px solid var(--line)}
 footer{margin-top:40px;color:var(--muted);font-size:13px;display:flex;gap:16px;flex-wrap:wrap}
 footer a{color:var(--muted)} footer a:hover{color:var(--jarvis)}
 
+/* gate */
+.gate{position:fixed;inset:0;z-index:50;background:var(--ground);display:flex;align-items:center;justify-content:center;padding:24px}
+.gate[hidden]{display:none}
+.gate form{width:min(380px,100%);background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:28px}
+.gate h2{font-weight:300;font-size:28px;margin:4px 0 14px;letter-spacing:-.02em}
+.gate label{display:block;color:var(--soft);font-size:13px;margin-bottom:8px}
+.gate input{width:100%;background:var(--ground);border:1px solid var(--line-strong);border-radius:8px;color:var(--ink);padding:11px 12px;font:inherit;min-height:44px}
+.gate input:focus-visible{outline:2px solid var(--jarvis);outline-offset:1px}
+.gate button{margin-top:12px;width:100%;min-height:44px;background:var(--jarvis);color:#04131a;border:0;border-radius:8px;font-weight:600;cursor:pointer}
+.gate .bad{color:var(--down);font-size:13px;margin:10px 0 0;min-height:1.2em}
+body.locked .wrap{visibility:hidden}
+
+/* sections */
+h2{font-weight:300;font-size:24px;letter-spacing:-.02em;margin:48px 0 14px}
+h2 small{font-size:14px;color:var(--muted);margin-left:12px;font-weight:400;letter-spacing:0}
+.incident{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin-bottom:10px;display:grid;gap:8px}
+.incident.open{border-color:rgba(239,68,68,.45)}
+.incident .top{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:baseline}
+.incident .top b{font-weight:500}
+.incident .when{color:var(--soft);font-size:13px;font-family:var(--mono)}
+.incident .chip{font-size:12px;padding:2px 8px;border-radius:999px;border:1px solid var(--line-strong);color:var(--soft)}
+.incident .chip.open{color:var(--down);border-color:rgba(239,68,68,.5)}
+.incident .diag{color:var(--soft);font-size:14px;display:grid;gap:4px}
+.incident .diag b{color:var(--ink);font-weight:500}
+.incident .diag ol{margin:2px 0 0;padding-left:20px}
+.empty{color:var(--muted);font-size:14px;max-width:60ch}
+.reports{display:grid;gap:10px}
+.report-month{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 18px}
+.report-month h3{margin:0 0 8px;font-weight:500;font-size:15px}
+.report-month ul{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.report-month li{display:flex;justify-content:space-between;gap:12px;font-size:14px}
+.report-month li span{color:var(--soft);font-family:var(--mono);font-size:13px}
+.report-month a:hover{color:var(--jarvis)}
+.c-perf{width:64px}.c-dom{width:86px}
+.perf.good{color:var(--up)} .perf.ok{color:var(--degraded)} .perf.poor{color:var(--down)}
+.paths{display:flex;gap:8px 18px;flex-wrap:wrap;color:var(--soft);font-size:13px}
+.paths code{font-family:var(--mono);color:var(--ink);font-size:12px}
+.paths .ok::before{content:"\2713  ";color:var(--up)} .paths .bad::before{content:"\2715  ";color:var(--down)}
+.vitals{display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:center}
+.vitals .score{font-family:var(--mono);font-size:32px;font-weight:500;line-height:1}
+.vitals .score small{display:block;font-family:var(--sans);font-size:12px;color:var(--muted);font-weight:400;margin-top:4px}
+.vitals .metrics{color:var(--soft);font-size:13px;display:flex;gap:16px;flex-wrap:wrap;margin-bottom:6px}
+.vitals .metrics b{font-family:var(--mono);color:var(--ink);font-weight:500}
+.vitals svg{display:block;width:100%;max-width:360px;height:40px;overflow:visible}
+.vitals .trend{fill:none;stroke:var(--jarvis);stroke-width:1.5}
+.detail-inc{display:grid;gap:6px;color:var(--soft);font-size:13px}
+.detail-inc b{color:var(--ink);font-weight:500}
+.status-link{font-size:13px;color:var(--soft)}
+.status-link a:hover{color:var(--jarvis)}
+
 @media (max-width:360px){
   td.spark{width:78px}
   .spark svg{width:72px}
@@ -163,7 +213,8 @@ footer a{color:var(--muted)} footer a:hover{color:var(--jarvis)}
   h1{font-size:32px}
   .ring{width:200px;height:200px}
   .center .big{font-size:36px}
-  .facts dl{grid-template-columns:repeat(3,1fr);gap:10px 8px;text-align:center}
+  .facts dl{grid-template-columns:repeat(2,1fr);gap:12px 8px;text-align:center}
+  .vitals{grid-template-columns:1fr}
   .facts dt{font-size:12px}
   .facts dd{font-size:14px}
   .facts dd small{font-size:12px}
@@ -179,6 +230,16 @@ footer a{color:var(--muted)} footer a:hover{color:var(--jarvis)}
 </style>
 </head>
 <body>
+<div id="gate" class="gate" hidden>
+  <form autocomplete="off">
+    <p class="eyebrow">// Williams Digital operations</p>
+    <h2>Jarvis</h2>
+    <label for="gateIn">Passphrase</label>
+    <input id="gateIn" type="password" autocomplete="current-password" required>
+    <p class="bad" id="gateBad" aria-live="polite"></p>
+    <button type="submit">Enter</button>
+  </form>
+</div>
 <div class="wrap">
   <header>
     <div>
@@ -204,6 +265,7 @@ footer a{color:var(--muted)} footer a:hover{color:var(--jarvis)}
       <dl>
         <div><dt>Slowest right now</dt><dd id="fSlow">—</dd></div>
         <div><dt>Next certificate to renew</dt><dd id="fCert">—</dd></div>
+        <div><dt>Next domain to renew</dt><dd id="fDom">—</dd></div>
         <div><dt>Fleet uptime, 30 days</dt><dd id="fUp">—</dd></div>
       </dl>
     </div>
@@ -231,13 +293,21 @@ footer a{color:var(--muted)} footer a:hover{color:var(--jarvis)}
         <th>Site</th>
         <th class="c-spark">Last 24 hours</th>
         <th class="num c-ms">Response</th>
+        <th class="num hide-m c-perf">Perf</th>
         <th class="num hide-m c-up">Uptime, 30 days</th>
         <th class="num hide-m c-cert">Certificate</th>
+        <th class="num hide-m c-dom">Domain</th>
         <th class="hide-m c-since">Since</th>
       </tr>
     </thead>
     <tbody id="rows"></tbody>
   </table>
+
+  <h2 id="incidents">Incidents <small>outages, with Claude's read on each</small></h2>
+  <div id="incList"></div>
+
+  <h2 id="reports">Client reports <small>built monthly as drafts for Dylan to forward</small></h2>
+  <div id="repList" class="reports"></div>
 
   <footer>
     <span>Checked every 15 minutes from GitHub Actions.</span>
@@ -251,7 +321,10 @@ footer a{color:var(--muted)} footer a:hover{color:var(--jarvis)}
 // Set this once the ElevenLabs agent exists to put Jarvis's voice widget on the page.
 const JARVIS_AGENT_ID = 'agent_4101m6qd5deve19rkf699svdr3s7';
 
-const S = { latest: null, spark: null, daily: null, filter: 'all', range: '24h', open: null, histories: {}, lastFetch: 0 };
+// SHA-256 of the passphrase (lower-cased). Change it with: node set-passphrase.mjs "new phrase"
+const GATE_HASH = '9771a2d23ac7f1e7fd2516095c47c9d32168f98e64f731254a33b5df48d4d9f1';
+
+const S = { latest: null, spark: null, daily: null, incidents: [], vitals: {}, reports: {}, filter: 'all', range: '24h', open: null, histories: {}, lastFetch: 0 };
 const $ = (id) => document.getElementById(id);
 const tip = $('tip');
 const bust = (p) => `${p}?t=${Math.floor(Date.now() / 60000)}`;
@@ -280,14 +353,25 @@ async function getJson(path) {
 
 async function load() {
   try {
-    const [latest, spark] = await Promise.all([getJson('data/latest.json'), getJson('data/spark.json')]);
-    S.latest = latest; S.spark = spark; S.lastFetch = Date.now();
+    const [latest, spark, incidents, vitals, reports] = await Promise.all([
+      getJson('data/latest.json'), getJson('data/spark.json'),
+      getJson('data/incidents.json').catch(() => []), getJson('data/vitals.json').catch(() => ({})), getJson('data/reports/index.json').catch(() => ({})),
+    ]);
+    S.latest = latest; S.spark = spark; S.incidents = incidents; S.vitals = vitals; S.reports = reports; S.lastFetch = Date.now();
     $('notice').hidden = true;
     render();
+    const t = Math.floor(Date.parse(latest.generatedAt) / 1000);
+    const staleMin = Math.floor((Date.now() / 1000 - t) / 60);
+    mountWidget({
+      headline: staleMin > 40 ? `${latest.headline} Mind you, that reading is ${ago(t)} old; the monitor appears to have stalled.` : latest.headline,
+      checked: ago(t),
+      open_incidents: String(latest.incidentsOpen || 0),
+    });
   } catch (e) {
     const n = $('notice');
     n.hidden = false; n.className = 'notice err';
     n.textContent = S.latest ? `Couldn't refresh (${e.message}). Showing the last data that loaded.` : `The monitor data isn't reachable yet (${e.message}). The first GitHub Actions run writes it.`;
+    mountWidget({ headline: "I can't reach the monitor at the moment, so I have no current reading.", checked: 'unknown', open_incidents: '0' });
   }
 }
 
@@ -297,14 +381,42 @@ function render() {
   renderRing(L);
   renderFacts(L);
   renderRows(L);
+  renderIncidents();
+  renderReports();
+}
+
+function dur(a, b) {
+  const m = Math.max(1, Math.round((b - a) / 60));
+  return m < 60 ? `${m} min` : m < 1440 ? `${Math.floor(m / 60)} h ${m % 60} min` : `${Math.floor(m / 1440)} d ${Math.floor((m % 1440) / 60)} h`;
+}
+
+function diagHtml(d) {
+  if (!d) return '';
+  return `<div class="diag"><div><b>Claude:</b> ${esc(d.summary)}</div><div>Likely cause: ${esc(d.likelyCause)}</div>${d.nextSteps?.length ? `<ol>${d.nextSteps.map(s => `<li>${esc(s)}</li>`).join('')}</ol>` : ''}</div>`;
+}
+
+function renderIncidents() {
+  const el = $('incList');
+  const inc = (S.incidents || []).slice().reverse().slice(0, 20);
+  if (!inc.length) { el.innerHTML = `<p class="empty">No outages recorded since monitoring began on November 5, 2026. When a site goes down it appears here, with Claude's diagnosis once the key is configured.</p>`; return; }
+  el.innerHTML = inc.map(i => `<article class="incident ${i.endedAt ? '' : 'open'}">
+    <div class="top"><b>${esc(i.name)}</b><span class="chip ${i.endedAt ? '' : 'open'}">${i.endedAt ? 'resolved after ' + dur(i.startedAt, i.endedAt) : 'ongoing, ' + ago(i.startedAt, { short: true })}</span><span class="when">${dayTimeFmt.format(new Date(i.startedAt * 1000))}</span></div>
+    ${i.note ? `<div class="diag">${esc(i.note)}</div>` : ''}${diagHtml(i.diagnosis)}</article>`).join('');
+}
+
+function renderReports() {
+  const el = $('repList');
+  const months = Object.keys(S.reports || {}).sort().reverse();
+  if (!months.length) { el.innerHTML = `<p class="empty">Reports are built on the first of each month from the previous month's checks, one per client site. The first batch lands December 1, 2026.</p>`; return; }
+  el.innerHTML = months.map(m => { const r = S.reports[m]; return `<div class="report-month"><h3>${esc(r.label)}</h3><ul>${(r.reports || []).map(x => `<li><a href="${esc(x.file)}" target="_blank" rel="noopener">${esc(x.name)}</a><span>${x.uptime}% up, ${x.avgMs} ms</span></li>`).join('')}</ul></div>`; }).join('');
 }
 
 function renderClock() {
   if (!S.latest) return;
   const t = Math.floor(Date.parse(S.latest.generatedAt) / 1000);
   const staleSec = Math.floor(Date.now() / 1000) - t;
-  const stale = staleSec > 45 * 60;
-  $('checked').innerHTML = `Checked <time datetime="${esc(S.latest.generatedAt)}" class="${stale ? 'stale' : ''}">${esc(ago(t))}</time>${stale ? ' — the cron may be behind' : ''}`;
+  const stale = staleSec > 40 * 60;
+  $('checked').innerHTML = `Checked <time datetime="${esc(S.latest.generatedAt)}" class="${stale ? 'stale' : ''}">${esc(ago(t))}</time>${stale ? ', so the monitor has stalled' : ''}`;
 }
 
 function renderRing(L) {
@@ -340,12 +452,17 @@ function renderFacts(L) {
   $('fSlow').innerHTML = slow ? `${fmtMs(slow.ms)}<small>${esc(slow.name)}</small>` : '—';
   const cert = L.sites.filter(s => typeof s.sslDays === 'number').sort((a, b) => a.sslDays - b.sslDays)[0];
   $('fCert').innerHTML = cert ? `${cert.sslDays}<span class="unit"> days</span><small>${esc(cert.name)}</small>` : '—';
+  const dom = L.sites.filter(s => typeof s.domainDays === 'number').sort((a, b) => a.domainDays - b.domainDays)[0];
+  $('fDom').innerHTML = dom ? `<span class="${dom.domainDays < 30 ? 'cert urgent' : dom.domainDays < 60 ? 'cert soon' : ''}">${dom.domainDays}<span class="unit"> days</span></span><small>${esc(dom.name)}</small>` : '—';
   const ups = L.sites.map(s => s.uptime30d).filter(v => typeof v === 'number');
   const fleet = ups.length ? (ups.reduce((a, b) => a + b, 0) / ups.length) : null;
   $('fUp').innerHTML = fleet == null ? '—' : `${fleet.toFixed(fleet === 100 ? 0 : 2)}<span class="unit">%</span><small>${L.sites.length} sites</small>`;
 }
 
-function certClass(d) { return d == null ? '' : d < 14 ? 'cert urgent' : d < 30 ? 'cert soon' : 'cert'; }
+function certClass(d) { return d == null ? '' : d < 10 ? 'cert urgent' : d < 30 ? 'cert soon' : 'cert'; }
+function domClass(d) { return d == null ? '' : d < 30 ? 'cert urgent' : d < 60 ? 'cert soon' : 'cert'; }
+function perfClass(v) { return v == null ? '' : v >= 90 ? 'perf good' : v >= 50 ? 'perf ok' : 'perf poor'; }
+function perfOf(slug) { return S.vitals?.[slug]?.latest?.score ?? null; }
 
 function renderRows(L) {
   const tbody = $('rows');
@@ -354,7 +471,7 @@ function renderRows(L) {
   for (const [owner, label] of groups) {
     const rows = L.sites.filter(s => s.owner === owner && (S.filter === 'all' || S.filter === owner));
     if (!rows.length) continue;
-    html += `<tr class="group"><td colspan="7">${label} (${rows.length})</td></tr>`;
+    html += `<tr class="group"><td colspan="9">${label} (${rows.length})</td></tr>`;
     for (const s of rows) {
       const open = S.open === s.slug;
       html += `<tr class="site ${open ? 'open' : ''}" data-slug="${esc(s.slug)}">
@@ -363,11 +480,13 @@ function renderRows(L) {
           <svg class="chev" viewBox="0 0 10 10" aria-hidden="true"><path d="M3 1l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>${esc(s.name)}</button></td>
         <td class="spark" data-spark="${esc(s.slug)}"></td>
         <td class="num">${fmtMs(s.ms)}</td>
+        <td class="num hide-m ${perfClass(perfOf(s.slug))}">${perfOf(s.slug) ?? '—'}</td>
         <td class="num hide-m">${s.uptime30d == null ? '—' : s.uptime30d + '<span class="unit">%</span>'}</td>
         <td class="num hide-m ${certClass(s.sslDays)}">${s.sslDays == null ? '—' : s.sslDays + '<span class="unit">d</span>'}</td>
+        <td class="num hide-m ${domClass(s.domainDays)}">${s.domainDays == null ? '—' : s.domainDays + '<span class="unit">d</span>'}</td>
         <td class="hide-m"><span class="since">${s.since ? esc(statusWord(s.status).toLowerCase() + ' for ' + ago(s.since, { short: true })) : '—'}</span></td>
       </tr>`;
-      if (open) html += `<tr class="detail" id="d-${esc(s.slug)}"><td colspan="7"><div class="detail-wrap" data-detail="${esc(s.slug)}"></div></td></tr>`;
+      if (open) html += `<tr class="detail" id="d-${esc(s.slug)}"><td colspan="9"><div class="detail-wrap" data-detail="${esc(s.slug)}"></div></td></tr>`;
     }
   }
   tbody.innerHTML = html;
@@ -429,9 +548,16 @@ async function fillDetail(slug) {
   if (!box) return;
   const s = S.latest.sites.find(x => x.slug === slug);
   box.innerHTML = `<div class="detail-head"><h3>${esc(s.name)}</h3><span class="meta"><a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.url.replace(/^https?:\/\//, '').replace(/\/$/, ''))}</a>${s.note ? ' — ' + esc(s.note) : ''}</span></div>
-    <div class="facts-row"><span>Uptime 24h <b>${s.uptime24h ?? '—'}%</b></span><span>Uptime 30d <b>${s.uptime30d ?? '—'}%</b></span><span>Certificate <b>${s.sslDays ?? '—'} days</b></span><span>HTTP <b>${s.httpStatus ?? '—'}</b></span><span>${statusWord(s.status)} for <b>${s.since ? ago(s.since, { short: true }) : '—'}</b></span></div>
+    <div class="facts-row"><span>Uptime 24h <b>${s.uptime24h ?? '—'}%</b></span><span>Uptime 30d <b>${s.uptime30d ?? '—'}%</b></span><span>Certificate <b>${s.sslDays ?? '—'} days</b></span><span>Domain <b>${s.domainDays ?? '—'} days</b></span><span>Rendered text <b>${s.renderChars == null ? '—' : s.renderChars.toLocaleString() + ' chars'}</b></span><span>HTTP <b>${s.httpStatus ?? '—'}</b></span>${s.tries > 1 ? `<span>Attempts <b>${s.tries}</b></span>` : ''}<span>${statusWord(s.status)} for <b>${s.since ? ago(s.since, { short: true }) : '—'}</b></span></div>
+    ${s.paths?.length ? `<div class="paths">${s.paths.map(p => { const f = (s.failedPaths || []).find(x => x.path === p); return `<span class="${f ? 'bad' : 'ok'}"><code>${esc(p)}</code>${f ? ' ' + esc(f.error || 'HTTP ' + f.status) : ''}</span>`; }).join('')}</div>` : ''}
     <div class="daily" data-daily></div>
-    <div class="chart" data-chart><svg viewBox="0 0 800 170"><text class="empty" x="0" y="90">Loading history…</text></svg></div>`;
+    <div class="chart" data-chart><svg viewBox="0 0 800 170"><text class="empty" x="0" y="90">Loading history…</text></svg></div>
+    <div class="vitals" data-vitals></div>
+    <div class="detail-inc" data-inc></div>
+    <p class="status-link">Public status page for this site: <a href="status/?s=${esc(s.slug)}" target="_blank" rel="noopener">status/?s=${esc(s.slug)}</a></p>`;
+  drawVitals(box.querySelector('[data-vitals]'), S.vitals?.[slug]);
+  const inc = (S.incidents || []).filter(i => i.slug === slug).slice(-3).reverse();
+  box.querySelector('[data-inc]').innerHTML = inc.length ? inc.map(i => `<div><b>${dayTimeFmt.format(new Date(i.startedAt * 1000))}</b> ${i.endedAt ? 'down for ' + dur(i.startedAt, i.endedAt) : 'still down'}${i.note ? ', ' + esc(i.note) : ''}${i.diagnosis ? ' <span>— ' + esc(i.diagnosis.summary) + '</span>' : ''}</div>`).join('') : '';
   try {
     if (!S.daily || Date.now() - S.lastFetch > 60000) S.daily = await getJson('data/daily.json');
   } catch { S.daily = S.daily || {}; }
@@ -446,6 +572,20 @@ async function fillDetail(slug) {
     } catch { series = []; }
   }
   if (S.open === slug) drawChart(box.querySelector('[data-chart]'), series);
+}
+
+function drawVitals(el, v) {
+  if (!v?.latest) { el.innerHTML = `<span class="empty">Performance score arrives after the first nightly Lighthouse run.</span>`; el.style.gridTemplateColumns = '1fr'; return; }
+  const L = v.latest, hist = v.history || [];
+  const W = 360, H = 40;
+  const x = (i) => hist.length < 2 ? W / 2 : (i / (hist.length - 1)) * W;
+  const y = (s) => H - 2 - (s / 100) * (H - 4);
+  const d = hist.map((h, i) => `${i ? 'L' : 'M'}${x(i).toFixed(1)} ${y(h.score).toFixed(1)}`).join(' ');
+  const dots = hist.length < 20 ? hist.map((h, i) => `<circle class="dotm" cx="${x(i).toFixed(1)}" cy="${y(h.score).toFixed(1)}" r="2.5"><title>${h.day}: ${h.score}</title></circle>`).join('') : '';
+  el.style.gridTemplateColumns = '';
+  el.innerHTML = `<div class="score ${perfClass(L.score)}">${L.score}<small>Lighthouse, mobile, ${esc(L.day)}</small></div>
+    <div><div class="metrics"><span>LCP <b>${(L.lcp / 1000).toFixed(1)} s</b></span><span>CLS <b>${L.cls}</b></span><span>Blocking <b>${L.tbt} ms</b></span><span>First paint <b>${(L.fcp / 1000).toFixed(1)} s</b></span></div>
+    <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Performance score trend, ${hist.length} days"><path class="trend" d="${d}"/>${dots}</svg></div>`;
 }
 
 function drawDaily(el, days) {
@@ -534,18 +674,41 @@ document.querySelectorAll('[data-range]').forEach(b => b.addEventListener('click
   if (S.open) fillDetail(S.open);
 }));
 
-if (JARVIS_AGENT_ID) {
+// --- Jarvis widget: mounted after the first data load so his greeting can quote the live headline ---
+let widgetMounted = false;
+function mountWidget(vars) {
+  if (!JARVIS_AGENT_ID || widgetMounted) return;
+  widgetMounted = true;
   const w = document.createElement('elevenlabs-convai');
   w.setAttribute('agent-id', JARVIS_AGENT_ID);
+  w.setAttribute('dynamic-variables', JSON.stringify(vars));
   document.body.appendChild(w);
   const sc = document.createElement('script');
   sc.src = 'https://unpkg.com/@elevenlabs/convai-widget-embed'; sc.async = true;
   document.body.appendChild(sc);
 }
 
-load();
-setInterval(load, 60000);
-setInterval(renderClock, 15000);
+// --- gate: the data files are public, but the page (and Jarvis's credits) sit behind a passphrase ---
+async function sha256(s) {
+  const b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
+  return [...new Uint8Array(b)].map(x => x.toString(16).padStart(2, '0')).join('');
+}
+function storedKey() { try { return localStorage.getItem('wdm_key'); } catch { return null; } }
+function start() { load(); setInterval(load, 60000); setInterval(renderClock, 15000); }
+function gate() {
+  if (!GATE_HASH || storedKey() === GATE_HASH || !window.crypto?.subtle) return start();
+  document.body.classList.add('locked');
+  const g = $('gate'), input = $('gateIn');
+  g.hidden = false; input.focus();
+  g.querySelector('form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const h = await sha256(input.value.trim().toLowerCase());
+    if (h !== GATE_HASH) { $('gateBad').textContent = "That isn't it."; input.select(); return; }
+    try { localStorage.setItem('wdm_key', h); } catch {}
+    g.hidden = true; document.body.classList.remove('locked'); start();
+  });
+}
+gate();
 </script>
 </body>
 </html>

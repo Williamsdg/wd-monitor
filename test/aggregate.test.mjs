@@ -77,3 +77,19 @@ test('recent: compact [t, ms, status] tuples inside the window, oldest first', a
   const history = [s(now - 30 * H, 'up', 100), s(now - 2 * H, 'degraded', 3200), s(now, 'up', 250)];
   assert.deepEqual(recent(history, { now, windowSec: 24 * H }), [[now - 2 * H, 3200, 'degraded'], [now, 250, 'up']]);
 });
+
+test('buildLatest: passes domain days, rendered chars, failed paths and attempt count through to the row', () => {
+  const sites = [{ slug: 'v', name: 'V', url: 'https://v.example/', owner: 'client', paths: [{ path: '/weddings' }, { path: '/airport' }] }];
+  const h = [{ t: 100, s: 'degraded', ms: 300, code: 200, ssl: 40, dom: 25, rc: 1800, paths: [{ path: '/weddings', status: 404 }], tries: 3, note: '/weddings returned 404' }];
+  const row = buildLatest(sites, { v: h }, { now: 200 }).sites[0];
+  assert.deepEqual(row.paths, ['/weddings', '/airport'], 'configured paths travel with the row so the dashboard can show the healthy ones too');
+  assert.equal(row.domainDays, 25);
+  assert.equal(row.renderChars, 1800);
+  assert.deepEqual(row.failedPaths, [{ path: '/weddings', status: 404 }]);
+  assert.equal(row.tries, 3);
+  const bare = buildLatest(sites, { v: [{ t: 100, s: 'up', ms: 300, code: 200, ssl: 40 }] }, { now: 200 }).sites[0];
+  assert.equal(bare.domainDays, null);
+  assert.equal(bare.renderChars, null);
+  assert.deepEqual(bare.failedPaths, []);
+  assert.equal(bare.tries, 1);
+});

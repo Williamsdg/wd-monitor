@@ -1,0 +1,46 @@
+name: report
+on:
+  schedule:
+    - cron: '0 13 1 * *'   # 1st of the month, morning Central: build last month's client reports
+  workflow_dispatch:
+    inputs:
+      month:
+        description: 'Month to report on (YYYY-MM). Blank = last month.'
+        required: false
+        default: ''
+permissions:
+  contents: write
+concurrency:
+  group: check
+  cancel-in-progress: false
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+      RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+      REPORT_TO: ${{ secrets.REPORT_TO }}
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --omit=dev
+      - name: Build reports and commit them
+        run: |
+          git config user.name "wd-monitor"
+          git config user.email "monitor@williamsdigital.io"
+          git fetch origin main && git reset -q --hard origin/main
+          node report.mjs ${{ github.event.inputs.month }}
+          git add data/reports
+          if git diff --cached --quiet; then echo "no change"; exit 0; fi
+          git commit -q -m "report: ${{ github.event.inputs.month || 'last month' }} [skip ci]"
+          for attempt in 1 2 3; do
+            if git push origin HEAD:main; then exit 0; fi
+            git fetch origin main && git rebase origin/main || { git rebase --abort; exit 1; }
+            sleep 5
+          done
+          exit 1

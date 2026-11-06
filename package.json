@@ -4,6 +4,17 @@
   "type": "module",
   "scripts": {
     "test": "node --test",
-    "check": "node check.mjs"
+    "check": "node check.mjs",
+    "vitals": "node vitals.mjs",
+    "report": "node report.mjs",
+    "mcp": "node mcp/server.mjs"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^1.6.0",
+    "@modelcontextprotocol/server": "^2.4.0",
+    "zod": "^4.6.7"
+  },
+  "engines": {
+    "node": ">=22"
   }
 }

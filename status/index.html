@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Site status</title>
+<meta name="description" content="Live uptime, response time and certificate status for a website looked after by Williams Digital.">
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ground:#070710; --panel:#0E0E1C; --line:rgba(255,255,255,.08); --line-strong:rgba(255,255,255,.16);
+  --ink:#FFFFFF; --soft:#A1A1AA; --muted:#71717A; --accent:#6366F1;
+  --up:#10B981; --degraded:#F59E0B; --down:#EF4444; --unknown:#3F3F46;
+  --sans:Inter,system-ui,-apple-system,"Segoe UI",sans-serif; --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+*{box-sizing:border-box}
+html{background:var(--ground);color-scheme:dark}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+.wrap{max-width:760px;margin:0 auto;padding:32px 16px 72px}
+.brand{display:flex;align-items:center;gap:12px;margin-bottom:40px}
+.brand .tab{width:4px;height:26px;background:var(--accent);border-radius:2px}
+.brand b{font-weight:600;letter-spacing:.14em;font-size:14px}
+.brand span{color:var(--muted);font-size:13px;margin-left:auto}
+h1{font-weight:300;font-size:34px;letter-spacing:-.025em;line-height:1.1;margin:0 0 6px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.dot{width:14px;height:14px;border-radius:50%;background:var(--unknown);flex:none}
+.dot.up{background:var(--up);box-shadow:0 0 16px rgba(16,185,129,.5)} .dot.degraded{background:var(--degraded)} .dot.down{background:var(--down);box-shadow:0 0 16px rgba(239,68,68,.6)}
+.lede{color:var(--soft);margin:0 0 32px;font-size:15px}
+.lede time{font-family:var(--mono);color:var(--ink)}
+.lede a{color:var(--soft)}
+.facts{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:36px}
+.fact{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.fact dt{color:var(--muted);font-size:13px;margin-bottom:6px}
+.fact dd{margin:0;font-family:var(--mono);font-size:22px;font-weight:500;line-height:1.1}
+.fact dd small{display:block;font-family:var(--sans);font-size:12px;color:var(--soft);font-weight:400;margin-top:4px}
+.fact.warn dd{color:var(--degraded)} .fact.bad dd{color:var(--down)}
+h2{font-weight:300;font-size:22px;letter-spacing:-.02em;margin:36px 0 12px}
+.strip{display:grid;grid-template-columns:repeat(30,minmax(0,1fr));gap:3px}
+.strip .c{height:20px;border-radius:3px;background:var(--unknown);opacity:.4}
+.strip .c.up{background:var(--up);opacity:1} .strip .c.degraded{background:var(--degraded);opacity:1} .strip .c.down{background:var(--down);opacity:1}
+.strip .c:hover{filter:brightness(1.25)}
+.axis{display:flex;justify-content:space-between;color:var(--muted);font-size:12px;font-family:var(--mono);margin-top:8px}
+.list{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.list li{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 16px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:15px}
+.list li span{color:var(--soft);font-family:var(--mono);font-size:13px}
+.list li.open{border-color:rgba(239,68,68,.45)}
+.list a:hover{color:var(--accent)}
+.empty{color:var(--muted);font-size:15px;margin:0}
+.picker{display:grid;gap:8px;list-style:none;padding:0;margin:0}
+.picker a{display:block;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px;text-decoration:none}
+.picker a:hover{border-color:var(--accent)}
+footer{margin-top:56px;color:var(--muted);font-size:13px;line-height:1.6}
+footer a{color:var(--muted)}
+.tip{position:fixed;z-index:10;pointer-events:none;background:#17172A;border:1px solid var(--line-strong);border-radius:6px;padding:6px 9px;font-size:12px;color:var(--soft);white-space:nowrap;display:none}
+@media (max-width:600px){
+  .facts{grid-template-columns:repeat(2,1fr)}
+  h1{font-size:28px}
+  .strip{gap:2px}.strip .c{height:14px;border-radius:2px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand"><span class="tab"></span><b>WILLIAMS DIGITAL</b><span>Site status</span></div>
+  <div id="app"><p class="empty">Loading…</p></div>
+  <footer>Checked every fifteen minutes by Williams Digital's monitoring. Uptime counts any check that got a healthy response. Questions: <a href="mailto:Dylan@williamsdigital.io">Dylan@williamsdigital.io</a></footer>
+</div>
+<div class="tip" id="tip" role="status"></div>
+<script>
+const slug = new URLSearchParams(location.search).get('s');
+const app = document.getElementById('app'), tip = document.getElementById('tip');
+const esc = (s) => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const bust = (p) => `../${p}?t=${Math.floor(Date.now() / 60000)}`;
+const get = (p, fb) => fetch(bust(p), { cache: 'no-store' }).then(r => r.ok ? r.json() : Promise.reject(new Error(r.status))).catch(() => fb);
+const TZ = 'America/Chicago';
+const dayKey = (t) => new Intl.DateTimeFormat('en-CA', { timeZone: TZ, year: 'numeric', month: '2-digit', day: '2-digit' }).format(t);
+const whenFmt = new Intl.DateTimeFormat('en-US', { timeZone: TZ, month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+const word = (s) => s === 'up' ? 'is up' : s === 'degraded' ? 'is up, with a warning' : s === 'down' ? 'is down' : 'has not been checked yet';
+function ago(sec) { const m = Math.max(0, Math.floor(Date.now() / 1000 - sec) / 60); return m < 1 ? 'just now' : m < 60 ? `${Math.floor(m)} min ago` : m < 2880 ? `${Math.floor(m / 60)} hr ago` : `${Math.floor(m / 1440)} days ago`; }
+function dur(a, b) { const m = Math.max(1, Math.round((b - a) / 60)); return m < 60 ? `${m} min` : `${Math.floor(m / 60)} h ${m % 60} min`; }
+function uptimeOver(days, n) {
+  let up = 0, all = 0; const start = dayKey(new Date(Date.now() - n * 86400000));
+  for (const [k, d] of Object.entries(days)) if (k >= start) { up += d.up; all += d.n; }
+  return all ? Math.round((up / all) * 1000) / 10 : null;
+}
+
+async function main() {
+  const latest = await get('data/latest.json', null);
+  if (!latest) { app.innerHTML = '<p class="empty">The status data is not reachable right now. Try again in a few minutes.</p>'; return; }
+  const site = latest.sites.find(s => s.slug === slug);
+  if (!site) {
+    const clients = latest.sites.filter(s => s.owner === 'client');
+    app.innerHTML = `<h1>Which site?</h1><p class="lede">Pick a site to see its status page.</p><ul class="picker">${clients.map(s => `<li><a href="?s=${esc(s.slug)}">${esc(s.name)}</a></li>`).join('')}</ul>`;
+    return;
+  }
+  document.title = `${site.name} status`;
+  const [daily, incidents, reports] = await Promise.all([get('data/daily.json', {}), get('data/incidents.json', []), get('data/reports/index.json', {})]);
+  const days = daily[slug] || {};
+  const gen = Math.floor(Date.parse(latest.generatedAt) / 1000);
+  const u30 = uptimeOver(days, 30), u90 = uptimeOver(days, 90);
+  const avg30 = (() => { let s = 0, n = 0; const start = dayKey(new Date(Date.now() - 30 * 86400000)); for (const [k, d] of Object.entries(days)) if (k >= start) { s += d.msSum; n += d.n; } return n ? Math.round(s / n) : null; })();
+  const certCls = site.sslDays == null ? '' : site.sslDays < 0 ? 'bad' : site.sslDays < 10 ? 'warn' : '';
+  const domCls = site.domainDays == null ? '' : site.domainDays < 0 ? 'bad' : site.domainDays < 30 ? 'warn' : '';
+  const keys = []; for (let i = 89; i >= 0; i--) keys.push(dayKey(new Date(Date.now() - i * 86400000)));
+  const cells = keys.map(k => { const v = days[k]; if (!v?.n) return `<div class="c" data-t="${k}: not monitored yet"></div>`; const pct = (v.up / v.n) * 100; const cls = pct === 100 ? 'up' : pct >= 99 ? 'degraded' : 'down'; return `<div class="c ${cls}" data-t="${k}: ${pct.toFixed(pct === 100 ? 0 : 1)}% up, ${v.n} checks"></div>`; }).join('');
+  const inc = incidents.filter(i => i.slug === slug).slice(-10).reverse();
+  const months = Object.keys(reports).sort().reverse().map(m => ({ m, label: reports[m].label, r: (reports[m].reports || []).find(x => x.slug === slug) })).filter(x => x.r);
+  app.innerHTML = `
+    <h1><span class="dot ${esc(site.status)}"></span>${esc(site.name)} ${word(site.status)}</h1>
+    <p class="lede"><a href="${esc(site.url)}" target="_blank" rel="noopener">${esc(site.url.replace(/^https?:\/\//, '').replace(/\/$/, ''))}</a>, checked <time datetime="${esc(latest.generatedAt)}">${ago(gen)}</time>${site.status === 'up' && site.since ? `, up for ${ago(site.since).replace(' ago', '')}` : ''}${site.note && site.status !== 'up' ? `. ${esc(site.note)}` : ''}</p>
+    <dl class="facts">
+      <div class="fact"><dt>Uptime, 30 days</dt><dd>${u30 == null ? '—' : u30 + '%'}</dd></div>
+      <div class="fact"><dt>Uptime, 90 days</dt><dd>${u90 == null ? '—' : u90 + '%'}<small>${Object.keys(days).length < 90 ? `${Object.keys(days).length} days monitored so far` : ''}</small></dd></div>
+      <div class="fact"><dt>Response time</dt><dd>${site.ms == null ? '—' : site.ms + ' ms'}<small>${avg30 == null ? '' : `30-day average ${avg30} ms`}</small></dd></div>
+      <div class="fact ${certCls}"><dt>Security certificate</dt><dd>${site.sslDays == null ? '—' : site.sslDays < 0 ? 'Expired' : 'Valid'}<small>${site.sslDays == null ? '' : site.sslDays < 0 ? '' : `renews within ${site.sslDays} days`}</small></dd></div>
+    </dl>
+    <h2>Last 90 days</h2>
+    <div class="strip">${cells}</div>
+    <div class="axis"><span>${keys[0].slice(5)}</span><span>one cell per day</span><span>today</span></div>
+    <h2>Outages</h2>
+    ${inc.length ? `<ul class="list">${inc.map(i => `<li class="${i.endedAt ? '' : 'open'}"><span>${whenFmt.format(new Date(i.startedAt * 1000))}</span>${i.endedAt ? `back up after ${dur(i.startedAt, i.endedAt)}` : 'being looked at now'}</li>`).join('')}</ul>` : '<p class="empty">No outages recorded.</p>'}
+    <h2>Monthly reports</h2>
+    ${months.length ? `<ul class="list">${months.map(x => `<li><a href="../${esc(x.r.file)}" target="_blank" rel="noopener">${esc(x.label)}</a><span>${x.r.uptime}% up</span></li>`).join('')}</ul>` : '<p class="empty">The first monthly report is published on the 1st of next month.</p>'}
+    ${site.domainDays != null ? `<p class="empty" style="margin-top:28px">Domain registration: ${site.domainDays < 0 ? 'expired' : `valid for another ${site.domainDays} days`}.</p>` : ''}`;
+  app.querySelectorAll('.strip .c').forEach(c => {
+    c.addEventListener('mouseenter', (e) => { tip.textContent = c.dataset.t; tip.style.display = 'block'; move(e); });
+    c.addEventListener('mousemove', move);
+    c.addEventListener('mouseleave', () => { tip.style.display = 'none'; });
+  });
+}
+function move(e) { const w = tip.offsetWidth, h = tip.offsetHeight; let l = e.clientX + 14, t = e.clientY - h - 14; if (l + w > innerWidth - 8) l = e.clientX - w - 14; if (t < 8) t = e.clientY + 14; tip.style.left = l + 'px'; tip.style.top = t + 'px'; }
+main();
+setInterval(main, 60000);
+</script>
+</body>
+</html>
