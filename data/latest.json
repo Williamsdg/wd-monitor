@@ -1,5 +1,5 @@
 {
- "generatedAt": "2026-11-10T23:30:46.000Z",
+ "generatedAt": "2026-11-11T02:57:42.000Z",
  "summary": {
   "total": 16,
   "up": 15,
@@ -14,10 +14,10 @@
    "url": "https://williamsdigital.io/",
    "owner": "own",
    "status": "up",
-   "ms": 349,
+   "ms": 357,
    "httpStatus": 200,
    "sslDays": 44,
-   "checkedAt": 1794353468,
+   "checkedAt": 1794365864,
    "paths": [
     "/contact",
     "/portfolio"
@@ -36,15 +36,15 @@
    "url": "https://theauburnnetwork.com/",
    "owner": "own",
    "status": "up",
-   "ms": 960,
+   "ms": 1075,
    "httpStatus": 200,
    "sslDays": 82,
-   "checkedAt": 1794353468,
+   "checkedAt": 1794365864,
    "paths": [
     "/login"
    ],
    "domainDays": 295,
-   "renderChars": 5684,
+   "renderChars": 5816,
    "failedPaths": [],
    "tries": 1,
    "since": 1793933458,
@@ -57,10 +57,10 @@
    "url": "https://canvassports.app/",
    "owner": "own",
    "status": "up",
-   "ms": 301,
+   "ms": 228,
    "httpStatus": 200,
    "sslDays": 77,
-   "checkedAt": 1794353468,
+   "checkedAt": 1794365864,
    "paths": [
     "/portal"
    ],
@@ -78,10 +78,10 @@
    "url": "https://filmroomhq.com/",
    "owner": "own",
    "status": "up",
-   "ms": 739,
+   "ms": 577,
    "httpStatus": 200,
    "sslDays": 89,
-   "checkedAt": 1794353468,
+   "checkedAt": 1794365864,
    "paths": [],
    "domainDays": 235,
    "renderChars": 6098,
@@ -97,10 +97,10 @@
    "url": "https://legacysportshq.com/",
    "owner": "own",
    "status": "up",
-   "ms": 1147,
+   "ms": 976,
    "httpStatus": 200,
    "sslDays": 86,
-   "checkedAt": 1794353468,
+   "checkedAt": 1794365864,
    "paths": [
     "/scores",
     "/brackets"
@@ -119,10 +119,10 @@
    "url": "https://welcomehoa.com/",
    "owner": "own",
    "status": "up",
-   "ms": 392,
+   "ms": 377,
    "httpStatus": 200,
    "sslDays": 53,
-   "checkedAt": 1794353468,
+   "checkedAt": 1794365864,
    "paths": [
     "/app/auth.html"
    ],
@@ -140,10 +140,10 @@
    "url": "https://ridgepole.io/",
    "owner": "own",
    "status": "up",
-   "ms": 224,
+   "ms": 492,
    "httpStatus": 200,
    "sslDays": 42,
-   "checkedAt": 1794353485,
+   "checkedAt": 1794365872,
    "paths": [
     "/contractors",
     "/demo/dashboard.html"
@@ -162,16 +162,16 @@
    "url": "https://buyauburn.com/",
    "owner": "own",
    "status": "up",
-   "ms": 185,
+   "ms": 301,
    "httpStatus": 200,
    "sslDays": 54,
-   "checkedAt": 1794353485,
+   "checkedAt": 1794365872,
    "paths": [
     "/directory.html",
     "/apply.html"
    ],
    "domainDays": 132,
-   "renderChars": 3617,
+   "renderChars": 3676,
    "failedPaths": [],
    "tries": 1,
    "since": 1793933458,
@@ -184,10 +184,10 @@
    "url": "https://simpatico-peach.vercel.app/",
    "owner": "own",
    "status": "up",
-   "ms": 1128,
+   "ms": 1350,
    "httpStatus": 200,
    "sslDays": 79,
-   "checkedAt": 1794353485,
+   "checkedAt": 1794365873,
    "paths": [
     "/spaces",
     "/login"
@@ -206,10 +206,10 @@
    "url": "https://swordandcrownsalon.com/",
    "owner": "client",
    "status": "degraded",
-   "ms": 827,
+   "ms": 436,
    "httpStatus": 200,
    "sslDays": 83,
-   "checkedAt": 1794353487,
+   "checkedAt": 1794365874,
    "paths": [
     "/consultation",
     "/wigs"
@@ -229,10 +229,10 @@
    "url": "https://cornerstoneadj.com/",
    "owner": "client",
    "status": "up",
-   "ms": 640,
+   "ms": 789,
    "httpStatus": 200,
    "sslDays": 81,
-   "checkedAt": 1794353487,
+   "checkedAt": 1794365875,
    "paths": [
     "/assign",
     "/contact"
@@ -251,10 +251,10 @@
    "url": "https://atnmissions.org/",
    "owner": "client",
    "status": "up",
-   "ms": 225,
+   "ms": 613,
    "httpStatus": 200,
    "sslDays": 85,
-   "checkedAt": 1794353488,
+   "checkedAt": 1794365876,
    "paths": [
     "/giving",
     "/store"
@@ -273,10 +273,10 @@
    "url": "https://sennmedicine.com/",
    "owner": "client",
    "status": "up",
-   "ms": 280,
+   "ms": 194,
    "httpStatus": 200,
    "sslDays": 54,
-   "checkedAt": 1794353488,
+   "checkedAt": 1794365878,
    "paths": [
     "/enroll"
    ],
@@ -294,10 +294,10 @@
    "url": "https://weaddalogo.com/",
    "owner": "client",
    "status": "up",
-   "ms": 208,
+   "ms": 966,
    "httpStatus": 200,
    "sslDays": 69,
-   "checkedAt": 1794353491,
+   "checkedAt": 1794365878,
    "paths": [
     "/shop",
     "/custom"
@@ -316,15 +316,15 @@
    "url": "https://vardartransportation.com/",
    "owner": "client",
    "status": "up",
-   "ms": 190,
+   "ms": 309,
    "httpStatus": 200,
    "sslDays": 50,
-   "checkedAt": 1794353492,
+   "checkedAt": 1794365879,
    "paths": [
     "/weddings",
     "/airport"
    ],
-   "domainDays": 581,
+   "domainDays": 580,
    "renderChars": 6356,
    "failedPaths": [],
    "tries": 1,
@@ -338,10 +338,10 @@
    "url": "https://cartpathclub.com/",
    "owner": "client",
    "status": "up",
-   "ms": 226,
+   "ms": 162,
    "httpStatus": 200,
    "sslDays": 61,
-   "checkedAt": 1794353493,
+   "checkedAt": 1794365880,
    "paths": [
     "/apply",
     "/members"
